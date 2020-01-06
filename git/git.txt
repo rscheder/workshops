@@ -1,0 +1,76 @@
+https://git-scm.com
+git config --global user.name "Ralf Schederecker"
+git config --global user.email "ralf.schederecker@ontrolware.de"
+
+
+git init
+git add main.tf variables.tf versions.tf
+git add .
+git commit -m "initial commit"
+git log
+git status
+alias graph="git log --graph --decorate --oneline --all"
+git branch rgroup
+git branch subnet
+
+graph
+git checkout rgroup
+    graph
+        => add new rgroup to main.tf
+    git add main.tf ; git commit -m "new rg testzwodrei added to main"
+    graph
+
+git checkout subnet
+    graph
+    cat main.tf
+
+git checkout rgroup
+    cat main.tf
+
+git checkout subnet
+        => add new subnet
+    git status
+    git commit -a -m "added subnet 3 to vnet 1"
+    graph
+
+        fast forward merge => direct path
+
+git status
+git checkout master
+git diff master..rgroup
+git merge rgroup
+graph
+git branch --merged
+git branch -d rgroup
+git branch -d subnet
+
+        three way merge / recursive
+
+git status
+git merge subnet
+git branch -d subnet
+
+
+git checkout -b dev
+        => change iprange of new subnet & name gitnet
+    git diff
+    git commit -a -m "update newsubnet to gitnet"
+
+git checkout master
+        => change iprange of old subnet and change gitnet ip range to different range & change name to gitnet
+
+        git commit -a -m "update main.tf"
+
+        graph
+                mergeconflict:
+                change to no change > change will win
+                both lines changed => conflict
+git status
+git merge dev
+git status
+git merge --abort
+git status
+graph
+git merge dev
+git status
+
