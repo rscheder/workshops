@@ -170,4 +170,8 @@ resource "azurerm_virtual_machine" "vm01" {
             key_data = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCynaLDGihHV9t7Vw9TEcsM1QDhvi6vc9LnUqcikL5kKOLhUuVHQKrOkBOf813uPKBLcq9IqaT7IsjJg6wSNgGo0K1q2qD+h+fM/nACyjIc8tXFDHO0It8fMKaZlwye2Qe1+y/nMBNBaJty3sfPdocJFrmqKSJxRPmBYOtSIPcqA6Mr6YGH+wEECXBPjCbmDiMho34jhk9uQoo6uFUAsB4Ls5d4fc7QSkyungUKz5t77iK8rQB4GEavd0EurK9pVDBGgRuTtABz7aig0iQ3i7woOibS8tWT8G4PCfE8NUPnxrD2+uoO/hpDgUUYD58ncL2+tCh3IAdBRMhhHhQ8pDi7"
         }
     }
+      boot_diagnostics {
+        enabled = "true"
+        storage_uri = azurerm_storage_account.sa01.primary_blob_endpoint
+    }
 }

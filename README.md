@@ -4,6 +4,7 @@
     main.tf - v200107
     az vm image list
     az vm user update --resource-group yarg001 --name wsvm01 --username RSCHEDER --ssh-key-value C:\Users\rscheder\.ssh\google_compute_engine.pub
+    az vm user update --resource-group myResourceGroup --name myVM --username myUsername --password myPassword
 
     main_partner.tf
     this file only describes the partner configuration, when the ws is performed alone
