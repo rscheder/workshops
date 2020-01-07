@@ -23,3 +23,11 @@ resource "azurerm_subnet" "partnervnetsub02" {
   address_prefix       = "10.11.2.0/24"
 }
 
+# enable global network peering between two virtual networks
+
+resource "azurerm_virtual_network_peering" "vnetpeer02" {
+  name                      = "peer2to1"
+  resource_group_name       =  azurerm_resource_group.rg02.name
+  virtual_network_name      =  azurerm_virtual_network.partnervnet01.name
+  remote_virtual_network_id =  azurerm_virtual_network.vnet01.id
+}
