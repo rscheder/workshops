@@ -67,26 +67,40 @@ data "azurerm_public_ip" "pip01" {
   resource_group_name = azurerm_resource_group.rg01.name
 }
 
+output "public_ip_address" {
+  value = data.azurerm_public_ip.pip01.ip_address
+}
+
 resource "azurerm_network_security_group" "nsg01" {
   name                = "wsnsg01"
   resource_group_name = azurerm_resource_group.rg01.name
   location            = azurerm_resource_group.rg01.location
-}
 
-# change source_address_prefix to data after pip was successfully created
-resource "azurerm_network_security_rule" "rdp" {
-  name                        = "rdp"
-  priority                    = 100
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "3389"
-# source_address_prefix       = data.azurerm_public_ip.pip01.ip_address
+  security_rule {
+    name                        = "rdp"
+    priority                    = 100
+    direction                   = "Inbound"
+    access                      = "Allow"
+    protocol                    = "Tcp"
+    source_port_range           = "*"
+    destination_port_range      = "3389"
+  # source_address_prefix       = data.azurerm_public_ip.pip01.ip_address
   source_address_prefix       = "*" 
-  destination_address_prefix  = "VirtualNetwork"
-  resource_group_name         = azurerm_resource_group.rg01.name
-  network_security_group_name = azurerm_network_security_group.nsg01.name
+    destination_address_prefix  = "VirtualNetwork"
+  }
+
+  security_rule {
+    name                        = "ssh"
+    priority                    = 101
+    direction                   = "Inbound"
+    access                      = "Allow"
+    protocol                    = "Tcp"
+    source_port_range           = "*"
+    destination_port_range      = "22"
+  # source_address_prefix       = data.azurerm_public_ip.pip01.ip_address
+  source_address_prefix       = "*" 
+    destination_address_prefix  = "VirtualNetwork"
+  }
 }
 
 resource "azurerm_network_interface" "nic01" {
@@ -98,6 +112,62 @@ resource "azurerm_network_interface" "nic01" {
     name                          = "wsipc01"
     subnet_id                     = azurerm_subnet.vnetsub01.id
     private_ip_address_allocation = "Dynamic"
+  # private_ip_address            = 10.10.0.8  
     public_ip_address_id          = azurerm_public_ip.pip01.id
   }
+}
+
+resource "azurerm_storage_account" "sa01" {
+  name                     = "wssa01"
+  location                 = azurerm_resource_group.rg01.location
+  resource_group_name      = azurerm_resource_group.rg01.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_virtual_machine" "vm01" {
+    name                  = "wsvm01"
+    location              = azurerm_resource_group.rg01.location
+    resource_group_name   = azurerm_resource_group.rg01.name
+    network_interface_ids = [azurerm_network_interface.nic01.id]
+    vm_size               = "Standard_B2s"
+
+    storage_os_disk {
+        name              = "wsvm01_osdisk"
+        caching           = "ReadWrite"
+        create_option     = "FromImage"
+        managed_disk_type = "Premium_LRS"
+    }
+
+    storage_image_reference {
+        publisher = "Debian"
+        offer     = "debian-10"
+        sku       = "10"
+        version   = "latest"
+    }
+
+  # storage_image_reference {
+  # publisher = "MicrosoftWindowsServer"
+  # offer     = "WindowsServer"
+  # sku       = "2016-Datacenter"
+  # version   = "latest"
+  # }
+
+    os_profile {
+        computer_name  = "myvm"
+        admin_username = "RSCHEDER"
+    }
+ # os_profile {
+ #    computer_name  = "wswin01"
+ #    admin_username = "admin"
+ #    admin_password = "T0p$ecr3t!"
+ # }
+
+    os_profile_linux_config {
+        disable_password_authentication = true
+        ssh_keys {
+            path     = "/home/RSCHEDER/.ssh/authorized_keys"
+            key_data = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCynaLDGihHV9t7Vw9TEcsM1QDhvi6vc9LnUqcikL5kKOLhUuVHQKrOkBOf813uPKBLcq9IqaT7IsjJg6wSNgGo0K1q2qD+h+fM/nACyjIc8tXFDHO0It8fMKaZlwye2Qe1+y/nMBNBaJty3sfPdocJFrmqKSJxRPmBYOtSIPcqA6Mr6YGH+wEECXBPjCbmDiMho34jhk9uQoo6uFUAsB4Ls5d4fc7QSkyungUKz5t77iK8rQB4GEavd0EurK9pVDBGgRuTtABz7aig0iQ3i7woOibS8tWT8G4PCfE8NUPnxrD2+uoO/hpDgUUYD58ncL2+tCh3IAdBRMhhHhQ8pDi7"
+        }
+    }
 }
