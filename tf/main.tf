@@ -42,7 +42,7 @@ resource "azurerm_subnet" "vnetsubgw" {
   address_prefix       = "10.10.255.0/27"
 }
 
-# enable global network peering between two virtual networks
+# enable network peering between two virtual networks
 
 resource "azurerm_virtual_network_peering" "vnetpeer01" {
   name                      = "peer1to2"
@@ -61,26 +61,29 @@ resource "azurerm_public_ip" "pip01" {
   allocation_method   = "Dynamic"
 }
 
+# comment this section until pip01 is created - data can only retrieved after creation
+data "azurerm_public_ip" "pip01" {
+  name                = azurerm_public_ip.pip01.name
+  resource_group_name = azurerm_resource_group.rg01.name
+}
+
 resource "azurerm_network_security_group" "nsg01" {
   name                = "wsnsg01"
   resource_group_name = azurerm_resource_group.rg01.name
   location            = azurerm_resource_group.rg01.location
 }
 
-data "azurerm_public_ip" "pip01" {
-  name                = azurerm_public_ip.pip01.name
-  resource_group_name = azurerm_resource_group.rg01.name
-}
-
+# change source_address_prefix to data after pip was successfully created
 resource "azurerm_network_security_rule" "rdp" {
   name                        = "rdp"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
-  source_port_range           = data.azurerm_public_ip.pip01.ip_address
+  source_port_range           = "*"
   destination_port_range      = "3389"
-  source_address_prefix       = data.azurerm_public_ip.pip01.ip_address
+# source_address_prefix       = data.azurerm_public_ip.pip01.ip_address
+  source_address_prefix       = "*" 
   destination_address_prefix  = "VirtualNetwork"
   resource_group_name         = azurerm_resource_group.rg01.name
   network_security_group_name = azurerm_network_security_group.nsg01.name
