@@ -1,5 +1,8 @@
 # workshops
 
+Because this is a repository for a workshop, and no consistent productive environment, a specific .gitignore has been created
+This file is stored globally by intention, to fullfill the clean storage without terrafore state files or plugins
+
 ## Terraform basic workshop
     main.tf - v200107
     az vm image list
