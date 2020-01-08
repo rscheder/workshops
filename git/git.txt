@@ -2,11 +2,15 @@ https://git-scm.com
 git config --global user.name "Ralf Schederecker"
 git config --global user.email "ralf.schederecker@ontrolware.de"
 
-
 git init
+# new files have to be added by name
 git add main.tf variables.tf versions.tf
+# additions, modifications can be staged via wildcard
 git add .
+# commit staged changes
 git commit -m "initial commit"
+# update online repo
+git push
 git log
 git status
 alias graph="git log --graph --decorate --oneline --all"
