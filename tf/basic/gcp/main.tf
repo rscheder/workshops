@@ -7,11 +7,11 @@ provider "google" {
 
 resource "google_compute_project_metadata_item" "ssh-keys" {
   key   = "ssh-keys"
-  value = "${var.public_key}"
+  value = var.public_key
 }
 
 resource "google_compute_instance" "vm_instance" {
-  name         = "tf_linux"
+  name         = "tflinux"
   machine_type = "f1-micro"
 
   boot_disk {
@@ -30,4 +30,20 @@ resource "google_compute_instance" "vm_instance" {
 resource "google_compute_network" "vpc_network" {
   name                    = "terraform-network"
   auto_create_subnetworks = "true"
+}
+
+resource "google_compute_firewall" "fwall" {
+  name    = "terraform-network-firewall"
+  network = google_compute_network.vpc_network.terraform-network
+
+  allow {
+    protocol = "ssh"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_tags = ["ssh"]
 }
