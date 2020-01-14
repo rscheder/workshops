@@ -34,11 +34,7 @@ resource "google_compute_network" "vpc_network" {
 
 resource "google_compute_firewall" "fwall" {
   name    = "terraform-network-firewall"
-  network = google_compute_network.vpc_network.terraform-network
-
-  allow {
-    protocol = "ssh"
-  }
+  network = google_compute_network.vpc_network.name
 
   allow {
     protocol = "tcp"
