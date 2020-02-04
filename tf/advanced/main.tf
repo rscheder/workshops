@@ -126,6 +126,11 @@ resource "azurerm_storage_account" "sa01" {
   account_replication_type = "LRS"
 }
 
+resource azurerm_network_watcher_flow_log nwflow-subnsg1 {
+
+
+}
+
 resource "azurerm_virtual_machine" "vm01" {
     name                  = "wsvm01"
     location              = azurerm_resource_group.rg01.location
